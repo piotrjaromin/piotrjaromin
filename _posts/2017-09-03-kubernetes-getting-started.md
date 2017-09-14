@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "NodeJs event loop"
+title:  "Kubernetes - getting started"
 date:   2017-09-10 17:03:06 +0200
-categories: event loop libuv nodejs
-tags: kubernetes
+categories: kubernetes tutorial pod service docker
+tags: kubernetes tutorial pod service docker
 ---
 
 Kubernetes or k8s in short is tool to orchestrate docker (and rkt) containers. By default docker containers are run on single machine if we want to run multiple nodes with different applications we would have to run them manually on each node, which can be really tiring when we have hundreds or thousands of nodes. Also monitoring, managing, log aggregation become really complicated tasks. Because of that orchestration tools have been developed like kubernetes, docker swarm, amazon ECS, azure container service, google container engine.  
