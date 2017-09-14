@@ -1,0 +1,102 @@
+---
+layout: post
+title:  "Releasing Zalgo"
+date:   2017-08-22 15:03:06 +0200
+categories: api asynchronous synchronous releasing Zalgo nodejs
+tags: api asynchronous synchronous releasing Zalgo nodejs
+---
+
+Term releasing Zalgo comes from Isaac Z. Schlueter [blog post](http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony). It is strictly associated with mixing synchronous and asynchronous behavior of api.
+
+It means that function in our api can either return immediately or asynchronously. When starting to work with nodejs or plain javascript there might be misconception, that everything that takes callback is being executed asynchronously, but it is not true. Example of synchronous function taking callback as argument is array forEach method; on the other hand in nodejs there is plenty of async functions like fs.readFile. Because of that we might fall in trap in which we write function that takes callback but depending on execution path behaves inconsistently by either returning synchronously or asynchronously.
+
+Below is example of over engineered way of reading files, but it shows what releasing zalgo is.
+
+```javascript
+
+const fs = require('fs');
+const cache = {};
+
+//Reads file either from file system or cache
+function zalgoRead(fileName, cb) { 
+    const file = cache[fileName]
+    if ( file ) {
+        console.log('reading from cache');
+        cb(null, file);
+    }
+
+    fs.readFile(fileName, (err, data) => {
+        if ( err) {
+            return cb(err);
+        }
+        cache[fileName] = data;
+        return cb(err, data);
+    });
+}
+
+//reads files, data can be retrieved by adding listeners to returned object, eg. reader('test.txt').addListener(listenerFunc)
+function reader(filename) {
+
+    const listeners = [];
+    zalgoRead(filename, (err, data) => {
+        listeners.forEach( listener => listener(err, data));
+    });
+
+    const addListener = (listener) => {
+        listeners.push(listener);
+    }
+
+    return {
+        addListener
+    }
+}
+```
+
+zalgoReader checks if file is in cache if file is found it will return immediately(synchrnous) by calling callback, otherwise it will
+try to read file with fs.readFile which is async operation. 
+
+Here we can see how it can be used:
+```javascript
+
+const readerHandler = reader("hello.txt")
+readerHandler.addListener( (err, data) => { 
+    console.log(`First read: ${data.toString('utf8')}`)
+
+    //lets try to read again the same file
+    reader("hello.txt").addListener( (err, data) => console.log(`Second read: ${data.toString('utf8')}`));
+});
+```
+
+And output on our screen will look like this:
+```
+First read: hello world from file
+
+reading from cache
+```
+
+We can see that first read went successfully, and that second read reached cache but nothing is printed.
+First call to read hello.txt was deferred(async) so it went to event loop and we had time to add listener,
+but second read was executed immediately in the same stack frame, meaning that our listener was added after listeners.forEach was executed.
+
+To fix this problem we could change zalgoRead function to:
+```javascript
+function zalgoRead(fileName, cb) { 
+    const file = cache[fileName] //lets assume that we have some cache
+    if ( file ) {
+        console.log('reading from cache');
+        return setImmediate(() => cb(null, file));
+    }
+
+    fs.readFile(fileName, (err, data) => {
+        if ( err) {
+            return cb(err);
+        }
+        cache[fileName] = data;
+        return cb(err, data);
+    });
+}
+```
+
+Thanks to this change reads from our cache will go through event loop before being executed and our api will work as predicted.
+
+This example is over complicated version of simple file read but it shows basic idea behind releasing zalgo, and why our api should be always consistent (either always synchronous or asynchronous).
