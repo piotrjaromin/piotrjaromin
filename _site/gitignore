@@ -1,0 +1,4 @@
+.vscode
+Gemfile.lock
+.sass-cache
+test.js

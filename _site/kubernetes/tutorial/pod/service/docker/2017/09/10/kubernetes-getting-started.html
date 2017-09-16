@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Kubernetes - getting started</title>
+  <meta name="description" content="Kubernetes or k8s in short is tool to orchestrate docker (and rkt) containers. By default docker containers are run on single machine if we want to run multi...">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="/kubernetes/tutorial/pod/service/docker/2017/09/10/kubernetes-getting-started.html">
+  <link rel="alternate" type="application/rss+xml" title="Piotr Jaromin Blog" href="/feed.xml">
+  
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+    
+    
+    <a class="site-title" href="/">Piotr Jaromin Blog</a>
+  
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          
+            
+            
+          
+            
+            
+            <a class="page-link" href="/about/">About</a>
+            
+          
+            
+            
+          
+            
+            
+          
+            
+            
+          
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Kubernetes - getting started</h1>
+    <p class="post-meta">
+      <time datetime="2017-09-10T17:03:06+02:00" itemprop="datePublished">
+        
+        Sep 10, 2017
+      </time>
+      </p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Kubernetes or k8s in short is tool to orchestrate docker (and rkt) containers. By default docker containers are run on single machine if we want to run multiple nodes with different applications we would have to run them manually on each node, which can be really tiring when we have hundreds or thousands of nodes. Also monitoring, managing, log aggregation become really complicated tasks. Because of that orchestration tools have been developed like kubernetes, docker swarm, amazon ECS, azure container service, google container engine.</p>
+
+<p>What kubernetes allows us to create master node, which will control all slave nodes that are connected to it. On those slave nodes we can deploy pods. Pods are either one or more containers, along with storage resources and IP (by documentation “pod is a single instance of an application in Kubernetes”). Pods can be exposed to external world or other pods by services, which are load balancing traffic. ReplicaSets are responsible for scaling up/down instances.</p>
+
+<p>Pods, services, replicaSets are objects in kubernetes api, they are entries stored in etcd database on k8s api server. Controllers are monitoring those objects so whenever property of object is changed, controller will execute operation to make this change valid in k8s cluster. For e.g. change to number of instances in replicaSet, will trigger controller and destroy or create new instances of pod.</p>
+
+<p>Other builtin kubernetes api objects are:</p>
+<ul>
+  <li>Deployment - controls pods and replicaSets</li>
+  <li>DaemonSet - ensures that pod is run on every node (e.g. pod responsible for collecting logs)</li>
+  <li>Volume - persistence layer, allows pod to store files and share them</li>
+  <li>Namespace - allow to splitting physical cluster into “virtual clusters”, for e.g. to allow different development teams to work without mixing their applications.</li>
+</ul>
+
+<p>Each of those objects have api version, if version contains alpha text then it might be changed without notice, about changes in beta we are notified in advance.</p>
+
+<p>With custom resource definitions there is possibility of creating our own object definitions.</p>
+
+<p>Kubernetes can be controller through command line tool called kubectl or by web api.</p>
+
+<h2 id="minikube">Minikube</h2>
+<p>Minikube is tool created for local development, it allows for creation of single node cluster of k8s. It creates preconfigured virtual machine with everything set up.</p>
+
+<p>Here is install <a href="https://kubernetes.io/docs/tasks/tools/install-minikube/">link</a>, kubectl installation instructions can also be found there.</p>
+
+<p>To start minikube instance:</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>minikube start
+</code></pre>
+</div>
+
+<p>To stop:</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>minikube stop
+</code></pre>
+</div>
+
+<h2 id="listing-resources">Listing resources</h2>
+
+<p>To List existing resource we can use</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>kubectl get resource_group
+</code></pre>
+</div>
+
+<p>where <code class="highlighter-rouge">resource_group</code> can be for e.g. pods, services, deployments, replicasets, nodes.
+Each of those resources have short aliases like po, svc, deploy, rs.</p>
+
+<p>Operating on single resource</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>kubectl get/delete/describe resource_group/name
+</code></pre>
+</div>
+
+<p>Where name can be obtained from resource list mentioned earlier.</p>
+
+<h2 id="kubectl-deploy-application">Kubectl deploy application</h2>
+
+<p>Ceate new deployment with one pod instance and docker image called <code class="highlighter-rouge">kieper/hellozz</code>.
+We are also passing environemnt variable called <code class="highlighter-rouge">HELLO_NAME</code> and value <code class="highlighter-rouge">"from my first app"</code>.
+Replicas inform of how many pods we want to create.</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>kubectl run hello-deployment --image<span class="o">=</span>kieper/hellozz --replicas<span class="o">=</span>1 --env<span class="o">=</span><span class="s2">"HELLO_NAME=from my first app"</span> 
+</code></pre>
+</div>
+
+<p>Now we cane expose our deployment as LoadBalancer type, <code class="highlighter-rouge">kieper/hellozz</code> is listening on port 3000
+so we are providing this as port value.</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>kubectl expose deployment hello-deployment --type<span class="o">=</span>LoadBalancer --name hello-service --port<span class="o">=</span>3000
+</code></pre>
+</div>
+
+<p>We can increase amount of running pods</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>kubectl scale --replicas<span class="o">=</span>3 deployment hello-deployment
+</code></pre>
+</div>
+
+<p>Also entering inside running docker container is possible with below command
+hello-deployment-XXXXX should be replaced with pod name, pod names cane be found by calling <code class="highlighter-rouge">kubectl get pods</code></p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>kubectl <span class="nb">exec</span> -it hello-deployment-XXXXX bash
+</code></pre>
+</div>
+
+<p>To reach our service on minikube we can call:</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>minikube service --url hello-service
+</code></pre>
+</div>
+
+<p>In return we will get address under which hellozz service is exposed</p>
+
+<p>to clean up</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>kubectl delete deploy hello-deployment
+kubectl delete svc hello-service
+</code></pre>
+</div>
+
+<p>Deleting deployments will also delete pods.</p>
+
+<h2 id="yaml-deploy-application">Yaml deploy application</h2>
+
+<p>Operations done in previous step can also be achieved by creating yaml files.</p>
+
+<p>For deployment: deployment.yaml</p>
+<div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
+<span class="s">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="s">metadata</span><span class="pi">:</span>
+  <span class="s">name</span><span class="pi">:</span> <span class="s">hello-deployment</span>
+<span class="s">spec</span><span class="pi">:</span>
+  <span class="s">replicas</span><span class="pi">:</span> <span class="s">3</span>
+  <span class="s">template</span><span class="pi">:</span>
+    <span class="s">metadata</span><span class="pi">:</span>
+      <span class="s">labels</span><span class="pi">:</span>
+        <span class="s">run</span><span class="pi">:</span> <span class="s">hello-deployment</span>
+    <span class="s">spec</span><span class="pi">:</span>
+      <span class="s">containers</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">env</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">HELLO_NAME</span>
+          <span class="s">value</span><span class="pi">:</span> <span class="s">my first app</span>
+        <span class="s">image</span><span class="pi">:</span> <span class="s">kieper/hellozz</span>
+        <span class="s">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+        <span class="s">name</span><span class="pi">:</span> <span class="s">hello-deployment</span>
+</code></pre>
+</div>
+
+<p>For service: service.yaml</p>
+<div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="s">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="s">metadata</span><span class="pi">:</span>
+  <span class="s">name</span><span class="pi">:</span> <span class="s">hello-service</span>
+<span class="s">spec</span><span class="pi">:</span>
+  <span class="s">ports</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">port</span><span class="pi">:</span> <span class="s">3000</span>
+    <span class="s">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+    <span class="s">targetPort</span><span class="pi">:</span> <span class="s">3000</span>
+  <span class="s">selector</span><span class="pi">:</span>
+    <span class="s">run</span><span class="pi">:</span> <span class="s">hello-deployment</span>
+  <span class="s">type</span><span class="pi">:</span> <span class="s">LoadBalancer</span>
+</code></pre>
+</div>
+
+<p>To create them in kubernetes cluster</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>kubectl create -f deployment.yaml
+kubectl create -f service.yaml
+</code></pre>
+</div>
+
+<p>to apply changes after modifying to files replace <code class="highlighter-rouge">create</code> with <code class="highlighter-rouge">apply</code></p>
+
+  </div>
+
+  
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Piotr Jaromin Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              Piotr Jaromin Blog
+            
+            </li>
+            
+            <li><a href="mailto:pjaromin89@gmail.com">pjaromin89@gmail.com</a></li>
+            
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/piotrjaromin"><span class="icon icon--github"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">piotrjaromin</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/piotrjaromin"><span class="icon icon--twitter"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">piotrjaromin</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Blog about technical things associated with programming
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
