@@ -1,4 +1,4 @@
 .vscode
 Gemfile.lock
-_site
 .sass-cache
+test.js
