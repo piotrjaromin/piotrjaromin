@@ -13,7 +13,7 @@ Lambda can be deployed in few ways, one of them is directly writing lambda code 
 
 Lambda stored in zip have additional advantage of being able to store not only code but some other file types, like pictures or binary files. In this article we will deploy lambda which can call `git clone` command by using [git](https://git-scm.com/) binary.
 
-NOTE: working code for this article can be found here: https://github.com/piotrjaromin/aws-lambda-git-clone-example
+NOTE: working code for this article can be found here: [https://github.com/piotrjaromin/aws-lambda-git-clone-example](https://github.com/piotrjaromin/aws-lambda-git-clone-example)
 
 ## tl;dr
 
