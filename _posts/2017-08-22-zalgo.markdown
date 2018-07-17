@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Releasing Zalgo"
+title:  "Releasing Zalgo - reason why your async code can be unpredictable in nodejs"
 date:   2017-08-22 15:03:06 +0200
 categories: api asynchronous synchronous releasing Zalgo nodejs
 tags: api asynchronous synchronous releasing Zalgo nodejs
@@ -18,7 +18,7 @@ const fs = require('fs');
 const cache = {};
 
 //Reads file either from file system or cache
-function zalgoRead(fileName, cb) { 
+function zalgoRead(fileName, cb) {
     const file = cache[fileName]
     if ( file ) {
         console.log('reading from cache');
@@ -53,13 +53,13 @@ function reader(filename) {
 ```
 
 zalgoReader checks if file is in cache if file is found it will return immediately(synchrnous) by calling callback, otherwise it will
-try to read file with fs.readFile which is async operation. 
+try to read file with fs.readFile which is async operation.
 
 Here we can see how it can be used:
 ```javascript
 
 const readerHandler = reader("hello.txt")
-readerHandler.addListener( (err, data) => { 
+readerHandler.addListener( (err, data) => {
     console.log(`First read: ${data.toString('utf8')}`)
 
     //lets try to read again the same file
@@ -80,7 +80,7 @@ but second read was executed immediately in the same stack frame, meaning that o
 
 To fix this problem we could change zalgoRead function to:
 ```javascript
-function zalgoRead(fileName, cb) { 
+function zalgoRead(fileName, cb) {
     const file = cache[fileName] //lets assume that we have some cache
     if ( file ) {
         console.log('reading from cache');

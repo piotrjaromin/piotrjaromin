@@ -1,11 +1,11 @@
 ---
 layout: post
-title:  "Generators and iterators"
+title:  "How to handle javascript generators and iterators"
 date:   2018-03-11 10:03:06 +0200
 categories: generators yield await nodejs javascript
 tags: generators yield await nodejs javascript
 ---
-# Generators and iterators
+# How to handle javascript generators and iterators
 
 ## Basics
 

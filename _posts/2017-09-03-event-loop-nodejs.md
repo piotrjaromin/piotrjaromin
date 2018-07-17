@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "NodeJs event loop"
+title:  "Internal works of NodeJs event loop"
 date:   2017-09-03 12:03:06 +0200
 categories: event loop libuv nodejs
 tags: event loop libuv nodejs

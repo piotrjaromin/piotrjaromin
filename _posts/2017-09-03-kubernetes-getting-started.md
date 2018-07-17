@@ -1,14 +1,14 @@
 ---
 layout: post
-title:  "Kubernetes - getting started"
+title:  "Kubernetes - deploying and exposing simple service"
 date:   2017-09-10 17:03:06 +0200
 categories: kubernetes tutorial pod service docker
 tags: kubernetes tutorial pod service docker
 ---
 
-Kubernetes or k8s in short is tool to orchestrate docker (and rkt) containers. By default docker containers are run on single machine if we want to run multiple nodes with different applications we would have to run them manually on each node, which can be really tiring when we have hundreds or thousands of nodes. Also monitoring, managing, log aggregation become really complicated tasks. Because of that orchestration tools have been developed like kubernetes, docker swarm, amazon ECS, azure container service, google container engine.  
+Kubernetes or k8s in short is tool to orchestrate docker (and rkt) containers. By default docker containers are run on single machine if we want to run multiple nodes with different applications we would have to run them manually on each node, which can be really tiring when we have hundreds or thousands of nodes. Also monitoring, managing, log aggregation become really complicated tasks. Because of that orchestration tools have been developed like kubernetes, docker swarm, amazon ECS, azure container service, google container engine.
 
-What kubernetes allows us to create master node, which will control all slave nodes that are connected to it. On those slave nodes we can deploy pods. Pods are either one or more containers, along with storage resources and IP (by documentation "pod is a single instance of an application in Kubernetes"). Pods can be exposed to external world or other pods by services, which are load balancing traffic. ReplicaSets are responsible for scaling up/down instances. 
+What kubernetes allows us to create master node, which will control all slave nodes that are connected to it. On those slave nodes we can deploy pods. Pods are either one or more containers, along with storage resources and IP (by documentation "pod is a single instance of an application in Kubernetes"). Pods can be exposed to external world or other pods by services, which are load balancing traffic. ReplicaSets are responsible for scaling up/down instances.
 
 Pods, services, replicaSets are objects in kubernetes api, they are entries stored in etcd database on k8s api server. Controllers are monitoring those objects so whenever property of object is changed, controller will execute operation to make this change valid in k8s cluster. For e.g. change to number of instances in replicaSet, will trigger controller and destroy or create new instances of pod.
 
@@ -22,7 +22,7 @@ Each of those objects have api version, if version contains alpha text then it m
 
 With custom resource definitions there is possibility of creating our own object definitions.
 
-Kubernetes can be controller through command line tool called kubectl or by web api. 
+Kubernetes can be controller through command line tool called kubectl or by web api.
 
 ## Minikube
 Minikube is tool created for local development, it allows for creation of single node cluster of k8s. It creates preconfigured virtual machine with everything set up.
@@ -63,11 +63,11 @@ We are also passing environemnt variable called ```HELLO_NAME``` and value ```"f
 Replicas inform of how many pods we want to create.
 
 ```bash
-kubectl run hello-deployment --image=kieper/hellozz --replicas=1 --env="HELLO_NAME=from my first app" 
+kubectl run hello-deployment --image=kieper/hellozz --replicas=1 --env="HELLO_NAME=from my first app"
 ```
 
 Now we cane expose our deployment as LoadBalancer type, ```kieper/hellozz``` is listening on port 3000
-so we are providing this as port value. 
+so we are providing this as port value.
 ```bash
 kubectl expose deployment hello-deployment --type=LoadBalancer --name hello-service --port=3000
 ```
