@@ -7,12 +7,13 @@ tags: event loop libuv nodejs
 ---
 
 NodeJs is single thread process with event loop at its heart. Whenever async operation is made, its callback is stored on one of the event loop queues. Event loop constantly checks if those queues have callbacks in them and executes them. We can split them into a few groups, which are checked in order placed below:
+
 1. timers - for setTimeout() and setInterval callbacks
 2. I/O callbacks - most of callbacks is executed here (e.g TCP errors, system operations)
 3. idle, prepare - internal usage
-5. poll - retrvies I/O events
-6. check - for setImmediate callbacks
-7. close callbacks - close events, e.g for socket.destroy()
+4. poll - retrieves I/O events
+5. check - for setImmediate callbacks
+6. close callbacks - close events, e.g for socket.destroy()
 
 Each of these queues is FIFO (first in, first out), it means that oldest elements are being executed first.
 In every event loop iteration each queue is checked, event loop will move on if queue is empty or when some hardcoded limit is reached (to prevent event loop starvation and hanging in one phase).
@@ -24,8 +25,9 @@ Libuv is native library in which event loop is implemented. It also allows nodej
 When kernel is finished executing async operation it will notify event loop by adding callback to poll queue.
 
 ## process.nextTick() vs setImmediate() vs setInterval()
+
 setInterval(callback, minTime) - callback will be executed in timers phase after minTime has passed(it might be later, but not sooner)
-process.nextTick(callback) - executes right after current phase, it is possible to stave event loop be nesting nextTick calls.
+process.nextTick(callback) - executes right after current phase, it is might be possible starve event loop by nesting nextTick calls.
 setImmediate(callback) - executed in check phase.
 
-The truth is that nextTick and setImmediate should probably change switched names.
+The truth is that nextTick and setImmediate should probably switch names.

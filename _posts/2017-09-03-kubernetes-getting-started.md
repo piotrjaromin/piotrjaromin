@@ -13,6 +13,7 @@ What kubernetes allows us to create master node, which will control all slave no
 Pods, services, replicaSets are objects in kubernetes api, they are entries stored in etcd database on k8s api server. Controllers are monitoring those objects so whenever property of object is changed, controller will execute operation to make this change valid in k8s cluster. For e.g. change to number of instances in replicaSet, will trigger controller and destroy or create new instances of pod.
 
 Other builtin kubernetes api objects are:
+
 - Deployment - controls pods and replicaSets
 - DaemonSet - ensures that pod is run on every node (e.g. pod responsible for collecting logs)
 - Volume - persistence layer, allows pod to store files and share them
@@ -25,16 +26,19 @@ With custom resource definitions there is possibility of creating our own object
 Kubernetes can be controller through command line tool called kubectl or by web api.
 
 ## Minikube
+
 Minikube is tool created for local development, it allows for creation of single node cluster of k8s. It creates preconfigured virtual machine with everything set up.
 
 Here is install [link](https://kubernetes.io/docs/tasks/tools/install-minikube/), kubectl installation instructions can also be found there.
 
 To start minikube instance:
+
 ```bash
 minikube start
 ```
 
 To stop:
+
 ```bash
 minikube stop
 ```
@@ -42,6 +46,7 @@ minikube stop
 ## Listing resources
 
 To List existing resource we can use
+
 ```bash
 kubectl get resource_group
 ```
@@ -58,8 +63,8 @@ Where name can be obtained from resource list mentioned earlier.
 
 ## Kubectl deploy application
 
-Ceate new deployment with one pod instance and docker image called ```kieper/hellozz```.
-We are also passing environemnt variable called ```HELLO_NAME``` and value ```"from my first app"```.
+Create new deployment with one pod instance and docker image called ```kieper/hellozz```.
+We are also passing environment variable called ```HELLO_NAME``` and value ```"from my first app"```.
 Replicas inform of how many pods we want to create.
 
 ```bash
@@ -68,11 +73,13 @@ kubectl run hello-deployment --image=kieper/hellozz --replicas=1 --env="HELLO_NA
 
 Now we cane expose our deployment as LoadBalancer type, ```kieper/hellozz``` is listening on port 3000
 so we are providing this as port value.
+
 ```bash
 kubectl expose deployment hello-deployment --type=LoadBalancer --name hello-service --port=3000
 ```
 
 We can increase amount of running pods
+
 ```bash
 kubectl scale --replicas=3 deployment hello-deployment
 ```
@@ -85,6 +92,7 @@ kubectl exec -it hello-deployment-XXXXX bash
 ```
 
 To reach our service on minikube we can call:
+
 ```bash
 minikube service --url hello-service
 ```
@@ -92,6 +100,7 @@ minikube service --url hello-service
 In return we will get address under which hellozz service is exposed
 
 to clean up
+
 ```bash
 kubectl delete deploy hello-deployment
 kubectl delete svc hello-service
@@ -104,6 +113,7 @@ Deleting deployments will also delete pods.
 Operations done in previous step can also be achieved by creating yaml files.
 
 For deployment: deployment.yaml
+
 ```yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -126,6 +136,7 @@ spec:
 ```
 
 For service: service.yaml
+
 ```yaml
 apiVersion: v1
 kind: Service
@@ -142,6 +153,7 @@ spec:
 ```
 
 To create them in kubernetes cluster
+
 ```bash
 kubectl create -f deployment.yaml
 kubectl create -f service.yaml
